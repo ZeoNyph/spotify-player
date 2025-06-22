@@ -1,5 +1,4 @@
 const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-const client_secret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET;
 
 export async function refreshToken() {
     const refreshToken = localStorage.getItem('refresh_token') || "";
@@ -7,11 +6,11 @@ export async function refreshToken() {
         method: "POST",
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            "Authorization": "Basic " + btoa(client_id + ':' + client_secret)
         },
         body: new URLSearchParams({
             grant_type: "refresh_token",
             refresh_token: refreshToken,
+            client_id: client_id || ""
         })
     });
     if (response.ok) {

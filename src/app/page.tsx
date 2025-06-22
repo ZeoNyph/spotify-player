@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { FaSpotify } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import LoadingScreen from './loading';
+import { getCookie } from 'cookies-next/client';
 export default function Home() {
 
   const router = useRouter();
@@ -16,26 +17,24 @@ export default function Home() {
   useEffect(() => {
       async function getToken() {
       const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-      const client_secret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET;
       if (params.has("code") && params.get("state") !== null) {
-        console.log(client_id, client_secret)
         const response = await fetch("https://accounts.spotify.com/api/token", {
           method: "POST",
           headers: {
             "content-type": "application/x-www-form-urlencoded",
-            "Authorization": "Basic " + btoa(client_id + ':' + client_secret)
           },
           body: new URLSearchParams({
+            client_id: client_id || "",
             grant_type: "authorization_code",
             code: params.get("code") || "",
-            redirect_uri: window.location.origin + "/"
+            redirect_uri: window.location.origin + "/",
+            code_verifier: getCookie("code_verifier") || ""
           })
         });
         if (response.ok){
           await response.json().then((data) => {
             localStorage.setItem("access_token", data.access_token)
             localStorage.setItem("refresh_token", data.refresh_token)
-            console.log(data.access_token)
             router.replace('/');
           }
         );}

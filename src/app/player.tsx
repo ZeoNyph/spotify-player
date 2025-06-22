@@ -24,6 +24,7 @@ export default function Player() {
         });
         if (response.status === 204) { //no playback
             setPlayerInfo(null);
+            setIsLoading(true);
         }
         else if (response.status === 401) {
             setPlayerInfo(null);
@@ -79,6 +80,7 @@ export default function Player() {
                             width={playerInfo.item.album.images[1].width}
                             height={playerInfo.item.album.images[1].height}
                             className="size-64 rounded-xl lg:rounded-3xl border-2 border-white p-2"
+                            priority={true}
                         />
                     )}
                     <div className="flex flex-col items-center gap-4">
@@ -125,7 +127,7 @@ export default function Player() {
                         </div>
                     )}
                 </div>
-                <div className="flex flex-row items-center gap-3">
+                {!isLoading && playerInfo !== null && <div className="flex flex-row items-center gap-3">
                     <button className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
                     {playerInfo?.device && (
                         <p>{playerInfo?.device.name}</p>
@@ -137,7 +139,7 @@ export default function Player() {
                             <button onClick={handleSkipNext} id="player_skipf" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaForwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
                         </>
                     )}
-                </div>
+                </div>}
             </div>}
         </>
     );

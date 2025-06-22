@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "";
@@ -12,8 +13,26 @@ function generateRandomString(length: number) {
     return result;
 }
 
+const sha256 = async (plain: string) => {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(plain)
+  return crypto.subtle.digest('SHA-256', data)
+}
+
+const base64encode = (input: ArrayBuffer) => {
+  return btoa(String.fromCharCode(...new Uint8Array(input)))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+const code_verifier = generateRandomString(64);
+const hashed = await sha256(code_verifier)
+const code_challenge = base64encode(hashed);
+
 
 export async function GET() {
+  (await cookies()).set("code_verifier", code_verifier)
   const auth_url = new URL('https://accounts.spotify.com/authorize?');
   const params = new URLSearchParams();
 
@@ -21,8 +40,10 @@ export async function GET() {
   params.set("response_type", "code");
   params.set("redirect_uri", "http://127.0.0.1:3000/");
   params.set("state", generateRandomString(16));
-  params.set("scope", "user-read-playback-state user-read-currently-playing user-modify-playback-state")
-  params.set("show_dialog", "true")
+  params.set("scope", "user-read-playback-state user-read-currently-playing user-modify-playback-state user-read-private");
+  params.set("code_challenge_method", "S256");
+  params.set("code_challenge", code_challenge);
+
 
   auth_url.search = params.toString();
 
