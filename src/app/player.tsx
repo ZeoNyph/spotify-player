@@ -71,7 +71,14 @@ export default function Player() {
 
     return (
         <>
-            {playerInfo === null && isLoading ? <ScaleLoader color="#ffffff" /> : <div className="flex flex-col gap-6 transition-all items-center text-center">
+            {playerInfo === null && isLoading ?
+             <div className="flex flex-col items-center gap-3">
+                <ScaleLoader color="#ffffff" />
+                <p>Loading...</p>
+                <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p>
+            </div> 
+             : 
+             <div className="flex flex-col gap-6 transition-all items-center text-center">
                 <div className="flex flex-col items-center gap-6 font-sans">
                     {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
                         <Image

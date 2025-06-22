@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
 
 export async function refreshToken() {
@@ -17,8 +19,9 @@ export async function refreshToken() {
         await response.json().then((data) => {
             localStorage.setItem("access_token", data.access_token)
             localStorage.setItem("refresh_token", data.refresh_token || refreshToken)
-        }
+            }
         );
+        redirect("/");
     }
 
 }
