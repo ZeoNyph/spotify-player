@@ -17,7 +17,7 @@ export async function refreshToken() {
         await response.json().then((data) => {
             localStorage.setItem("access_token", data.access_token)
             localStorage.setItem("refresh_token", data.refresh_token || refreshToken)
-            }
+        }
         );
     }
 
@@ -52,4 +52,27 @@ export async function isPremiumUser() {
     });
     const data = await response.json();
     return data.product === "premium";
+}
+
+export async function getDevices() {
+    const response = await fetch(" https://api.spotify.com/v1/me/player/devices", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        }
+    });
+    const data = await response.json();
+    return data
+}
+
+export async function switchDevice(device: string) {
+    const response = await fetch(" https://api.spotify.com/v1/me/player/", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+        method: "PUT",
+        body: JSON.stringify({
+            device_ids: [device]
+        })
+    });
+    return response.status
 }

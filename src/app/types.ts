@@ -23,6 +23,10 @@ export interface Device {
   volume_percent: number
 }
 
+export interface DeviceRequest {
+    devices: Device[]
+}
+
 export interface Context {
   external_urls: ExternalUrls
   href: string

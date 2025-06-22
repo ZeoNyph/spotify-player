@@ -23,7 +23,7 @@ export default function Player() {
 
     async function getPlayerInfo() {
         if (localStorage.getItem("refresh_token")) {
-            const response = await fetch("https://api.spotify.com/v1/me/player", {
+            const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
                 headers: {
                     "authorization": "Bearer " + localStorage.getItem("access_token")
                 },
@@ -78,7 +78,7 @@ export default function Player() {
     }, [playerInfo])
 
     useEffect(() => {
-        const interval = setInterval(getPlayerInfo, 100);
+        const interval = setInterval(getPlayerInfo, 500);
         return () => { clearInterval(interval) }
     }, []);
 
@@ -149,9 +149,6 @@ export default function Player() {
                     </div>
                     {!isLoading && playerInfo !== null && <div className="flex flex-row items-center gap-3">
                         <button onClick={() => {setShowDevices(true);}} className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
-                        {playerInfo?.device && (
-                            <p>{playerInfo?.device.name}</p>
-                        )}
                         {showDevices && typeof window !== "undefined" && createPortal(<DeviceModal onClose={() => setShowDevices(false)}/>, document.body)}
                         {isPremium && (
                             <>
