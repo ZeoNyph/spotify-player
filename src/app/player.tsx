@@ -12,6 +12,7 @@ export default function Player() {
 
     const [playerInfo, setPlayerInfo] = useState<Root | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isRefetching, setIsRefetching] = useState(false);
     const [isPremium, setIsPremium] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -28,6 +29,7 @@ export default function Player() {
         }
         else if (response.status === 401) {
             setPlayerInfo(null);
+            setIsRefetching(true);
             refreshToken();
         }
         else {
@@ -71,11 +73,11 @@ export default function Player() {
 
     return (
         <>
-            {playerInfo === null && isLoading ?
+            {playerInfo === null && (isLoading || isRefetching) ?
              <div className="flex flex-col items-center gap-3">
                 <ScaleLoader color="#ffffff" />
-                <p>Loading...</p>
-                <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p>
+                <p>{!isRefetching? "Loading..." : "Token expired, refetching..."}</p>
+                {!isRefetching ? <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
             </div> 
              : 
              <div className="flex flex-col gap-6 transition-all items-center text-center">
