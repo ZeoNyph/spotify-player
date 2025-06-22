@@ -1,5 +1,14 @@
 Simple Spotify controller made using [Next.js](https://nextjs.org) and bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Features
+
+- Play, pause, and skip music being played on any Spotify instance.
+- View info on currently playing song
+- Switch between available Spotify devices
+
+
+![alt text](img/image.png)
+
 ## Getting Started
 
 First, run the development server:
