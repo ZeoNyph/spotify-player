@@ -11,11 +11,10 @@ export default function Home() {
   const router = useRouter();
 
   const params = useSearchParams();
-  const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function getToken() {
+      async function getToken() {
       const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
       const client_secret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET;
       if (params.has("code") && params.get("state") !== null) {
@@ -35,6 +34,7 @@ export default function Home() {
         if (response.ok){
           await response.json().then((data) => {
             localStorage.setItem("access_token", data.access_token)
+            localStorage.setItem("refresh_token", data.refresh_token)
             console.log(data.access_token)
             router.replace('/');
           }
@@ -43,18 +43,14 @@ export default function Home() {
     }
     getToken();
     setIsLoading(false);
-  }, [isLoading, params, router]);
-
-  useEffect(() => {
-    setToken(localStorage.getItem("access_token") || "");
-  }, [token])
+  },[isLoading, params, router]);
 
   return (
     <>
     {!isLoading? (
       <div className="flex flex-col items-center justify-center min-h-screen font-sans gap-8">
         <h1 className="text-4xl font-bold mb-4">Spotify Player</h1>
-        {!token && (
+        {!localStorage.getItem("access_token") && (
         <a
           href="/login"
           className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4 flex flex-row items-center gap-2"
@@ -62,7 +58,7 @@ export default function Home() {
           <FaSpotify></FaSpotify>Login with Spotify
         </a>
         )}
-        <Player />
+        {localStorage.getItem("access_token")? <Player />: null}
       </div>) : <LoadingScreen/>
     }
     </>
