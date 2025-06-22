@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Root } from "./types";
+import { PlayerInfoRequest } from "./types";
 import { ScaleLoader } from "react-spinners";
 import { isPremiumUser, playPause, refreshToken, skip } from "./spotify";
 import { FaBackwardStep, FaForwardStep, FaHeadphones, FaPlay } from "react-icons/fa6";
@@ -14,7 +14,7 @@ import { createPortal } from "react-dom";
 export default function Player() {
 
     const router = useRouter();
-    const [playerInfo, setPlayerInfo] = useState<Root | null>(null);
+    const [playerInfo, setPlayerInfo] = useState<PlayerInfoRequest | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefetching, setIsRefetching] = useState(false);
     const [isPremium, setIsPremium] = useState(false);

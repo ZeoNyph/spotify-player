@@ -1,4 +1,4 @@
-export interface Root {
+export interface PlayerInfoRequest {
   device: Device
   shuffle_state: boolean
   smart_shuffle: boolean
