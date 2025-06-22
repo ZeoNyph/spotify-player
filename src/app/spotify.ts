@@ -1,4 +1,3 @@
-
 const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
 
 export async function refreshToken() {
