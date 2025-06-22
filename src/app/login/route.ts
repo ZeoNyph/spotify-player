@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-const client_id = process.env.SPOTIFY_CLIENT_ID || "";
+const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "";
 
 function generateRandomString(length: number) {
     let result = '';
@@ -19,9 +19,9 @@ export async function GET() {
 
   params.set("client_id", client_id);
   params.set("response_type", "code");
-  params.set("redirect_uri", "http://127.0.0.1:3000/callback");
+  params.set("redirect_uri", "http://127.0.0.1:3000/");
   params.set("state", generateRandomString(16));
-  params.set("scope", "user-read-private user-read-email");
+  params.set("scope", "user-read-playback-state user-read-currently-playing user-modify-playback-state")
   params.set("show_dialog", "true")
 
   auth_url.search = params.toString();
