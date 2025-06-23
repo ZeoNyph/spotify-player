@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { getDevices, switchDevice } from "./spotify";
-import { Device, DeviceRequest } from "./types";
+import { getDevices, switchDevice } from "../../app/spotify";
+import { Device, DeviceRequest } from "../../app/types";
 import { FaLaptop, FaMobile, FaVolumeHigh } from "react-icons/fa6";
 
 type DeviceModalProps = {
@@ -62,7 +62,7 @@ export default function DeviceModal({ onClose }: DeviceModalProps) {
                                     <p className="text-gray-800">{device.name}</p>
                                     <p className="text-xs text-gray-500 flex flex-row items-center gap-1">{getIcon(device.type)}{device.type}</p>
                                 </div>
-                                <button onClick={(e) => handleSwitch(e)} id={device.id} disabled={device.is_active} className="justify-self-end disabled:bg-gray-700 rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 text-white hover:text-gray-900">{device.is_active?"Is Active" : "Switch"}</button>
+                                <button onClick={(e) => handleSwitch(e)} id={device.id} disabled={device.is_active} className="justify-self-end disabled:bg-gray-700 rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 text-white hover:text-gray-900">{device.is_active ? "Is Active" : "Switch"}</button>
                             </div>
                         ))
                     ) : (

@@ -1,15 +1,16 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { PlayerInfoRequest } from "./types";
+import { PlayerInfoRequest } from "../app/types";
 import { ScaleLoader } from "react-spinners";
-import { isPremiumUser, playPause, refreshToken, skip } from "./spotify";
+import { isPremiumUser, playPause, refreshToken, skip } from "../app/spotify";
 import { FaBackwardStep, FaForwardStep, FaHeadphones, FaPlay } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import DeviceModal from "./devices";
+import DeviceModal from "./modals/devices";
 import { createPortal } from "react-dom";
+import Playlists from "./playlists";
 
 export default function Player() {
 
@@ -20,6 +21,9 @@ export default function Player() {
     const [isPremium, setIsPremium] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [showDevices, setShowDevices] = useState(false);
+
+
+    const info = useCallback(getPlayerInfo, [router])
 
     async function getPlayerInfo() {
         if (localStorage.getItem("refresh_token")) {
@@ -44,7 +48,7 @@ export default function Player() {
                 setIsLoading(false);
             }
         }
-        else{
+        else {
             localStorage.removeItem("access_token");
             router.refresh();
         }
@@ -78,9 +82,9 @@ export default function Player() {
     }, [playerInfo])
 
     useEffect(() => {
-        const interval = setInterval(getPlayerInfo, 500);
+        const interval = setInterval(info, 500);
         return () => { clearInterval(interval) }
-    }, []);
+    }, [info]);
 
     return (
         <>
@@ -91,7 +95,7 @@ export default function Player() {
                     {!isRefetching ? <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
                 </div>
                 :
-                <div className={"flex flex-col gap-6 transition-all items-center text-center" + (showDevices? " blur-xl" : "")}>
+                <div className={"flex flex-col gap-6 transition-all items-center text-center" + (showDevices ? " blur-xl" : "")}>
                     <div className="flex flex-col items-center gap-6 font-sans">
                         {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
                             <Image
@@ -148,16 +152,17 @@ export default function Player() {
                         )}
                     </div>
                     {!isLoading && playerInfo !== null && <div className="flex flex-row items-center gap-3">
-                        <button onClick={() => {setShowDevices(true);}} className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
-                        {showDevices && typeof window !== "undefined" && createPortal(<DeviceModal onClose={() => setShowDevices(false)}/>, document.body)}
                         {isPremium && (
                             <>
+                                <button onClick={() => { setShowDevices(true); }} className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
+                                {showDevices && createPortal(<DeviceModal onClose={() => setShowDevices(false)} />, document.body)}
                                 <button onClick={handleSkipPrev} id="player_skipb" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaBackwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
                                 <button onClick={handlePlayPause} id="player_playpause" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200">{isPlaying ? <FaPause className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /> : <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />}</button>
                                 <button onClick={handleSkipNext} id="player_skipf" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaForwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
                             </>
                         )}
                     </div>}
+                    <Playlists />
                 </div>}
         </>
     );

@@ -74,5 +74,17 @@ export async function switchDevice(device: string) {
             device_ids: [device]
         })
     });
-    return response.status
+    return response.status;
+}
+
+export async function getPlaylists(limit: number, offset: number) {
+    const response = await fetch(" https://api.spotify.com/v1/me/playlists?" + new URLSearchParams({
+            limit: limit.toString() || "5",
+            offset: offset.toString() || "0",
+        }).toString(), {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+    });
+    return await response.json();
 }
