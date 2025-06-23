@@ -100,7 +100,7 @@ export interface Disallows {
     resuming: boolean
 }
 
-export interface PlaylistRequest {
+export interface PlaylistsRequest {
     href: string
     limit: number
     next: string | null
@@ -139,4 +139,25 @@ export interface Owner {
 export interface Tracks {
     href: string
     total: number
+}
+
+export interface PlaylistRequest {
+    uri: string
+    tracks: PlaylistTracks
+}
+
+export interface PlaylistTracks {
+    items: Item[]
+}
+
+export interface Item {
+    track: Track
+}
+
+export interface Track {
+    album: Album
+    artists: Artist[]
+    uri: string
+    name: string
+    id: string
 }

@@ -25,18 +25,22 @@ export async function refreshToken() {
 
 interface playPauseProps {
     isPlay: boolean,
-    uri?: string | ""
+    collectionURI?: string | "",
+    songURI?: string | ""
 }
 
-export async function playPause({ isPlay, uri }: playPauseProps) {
+export async function playPause({ isPlay, collectionURI, songURI }: playPauseProps) {
     const response = await fetch("https://api.spotify.com/v1/me/player" + (isPlay ? "/play" : "/pause"), {
         headers: {
             "Authorization": "Bearer " + localStorage.getItem("access_token"),
             "Content-Type": "application/json"
         },
         method: "PUT",
-        body: uri ? JSON.stringify({
-            context_uri: uri || "",
+        body: collectionURI ? JSON.stringify({
+            context_uri: collectionURI || "",
+            offset: {
+                uri: songURI || ""
+            }
         }) : null
     });
     return response.ok
@@ -99,13 +103,13 @@ export async function getPlaylists(limit: number, offset: number) {
 }
 
 export async function getPlaylist(uri: string) {
-    const response = await fetch(uri, {
+    const url = new URL("https://api.spotify.com/v1/playlists/" + uri + "?")
+    const response = await fetch(url + new URLSearchParams({
+        fields: "uri,tracks.items(track(id, name, uri, artists, album(name, href))"
+    }).toString(), {
         headers: {
             "Authorization": "Bearer " + localStorage.getItem("access_token"),
         },
-        body: new URLSearchParams({
-            fields: "tracks.items(track(name, href, artists, album(name, href))"
-        })
     });
     return await response.json();
 }

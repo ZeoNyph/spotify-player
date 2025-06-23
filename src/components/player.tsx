@@ -21,6 +21,7 @@ export default function Player() {
     const [isPremium, setIsPremium] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [showDevices, setShowDevices] = useState(false);
+    const [showPlaylist, setShowPlaylist] = useState(false);
 
 
     const info = useCallback(getPlayerInfo, [router])
@@ -55,7 +56,7 @@ export default function Player() {
     }
 
     async function handlePlayPause() {
-        await playPause({ isPlay: !isPlaying, uri: "" });
+        await playPause({ isPlay: !isPlaying, collectionURI: "" });
     }
 
     async function handleSkipNext() {
@@ -95,7 +96,7 @@ export default function Player() {
                     {!isRefetching ? <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
                 </div>
                 :
-                <div className={"relative flex flex-col gap-6 transition-all items-center text-center" + (showDevices ? " blur-xl" : "")}>
+                <div className={"relative flex flex-col gap-6 transition-all items-center text-center" + (showDevices || showPlaylist ? " blur-xl" : "")}>
                     <div className="items-center justify-center">
                         <div className="flex flex-col items-center gap-6 font-sans">
                             {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
@@ -164,7 +165,7 @@ export default function Player() {
                             )}
                         </div>}
                     </div>
-                    <Playlists />
+                    <Playlists showPlaylist={showPlaylist} setShowPlaylist={setShowPlaylist} />
                 </div>}
         </>
     );
