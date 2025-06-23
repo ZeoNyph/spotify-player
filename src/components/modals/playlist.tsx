@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef } from "react"
 import { getPlaylist, playPause } from "../../app/spotify";
 import { Item, PlaylistRequest } from "../../app/types";
 import { FaPlay } from "react-icons/fa6";
+import { ScaleLoader } from "react-spinners";
 
 type PlaylistModalProps = {
     onClose: () => void,
@@ -46,11 +47,12 @@ export default function PlaylistModal({ onClose, uri = "" }: PlaylistModalProps)
                                 <button onClick={async () => {
                                     if (!playlistInfo.current) return;
                                     await playPause({ isPlay: true, collectionURI: playlistInfo.current.uri, songURI: item.track.uri });
+                                    onClose();
                                 }} id={item.track.id} className="justify-self-end disabled:bg-gray-700 rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 text-white hover:text-gray-900"> <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Play</button>
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500">No songs found.</p>
+                        <ScaleLoader color="#000000" className="mx-auto" />
                     )}
                 </div>
                 <div className="flex justify-end my-2">

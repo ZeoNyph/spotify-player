@@ -41,7 +41,7 @@ export async function GET() {
   params.set("response_type", "code");
   params.set("redirect_uri", redirect_url);
   params.set("state", generateRandomString(16));
-  params.set("scope", "user-read-playback-state user-read-currently-playing user-modify-playback-state user-read-private");
+  params.set("scope", "user-read-playback-state user-read-currently-playing user-modify-playback-state user-read-private user-library-read");
   params.set("code_challenge_method", "S256");
   params.set("code_challenge", code_challenge);
 

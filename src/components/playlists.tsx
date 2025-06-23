@@ -26,9 +26,9 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
         await playPause({ isPlay: true, collectionURI: e.currentTarget.value })
     }
     return (
-        <div className="absolute inset-x-0 top-full mt-10 mb-5 flex flex-col justify-baseline gap-2 px-6">
-            <div className="flex flex-row justify-between">
-                <h1 className="text-2xl font-bold text-left pl-2">Playlists</h1>
+        <div className="mt-10 mb-5 flex flex-col justify-baseline gap-2 px-6">
+            <div className="flex flex-col md:flex-row justify-between gap-2">
+                <h1 className="text-2xl font-bold text-center md:text-left pl-2">Playlists</h1>
                 <div>
                     <button
                         className="px-4 py-2 mr-2 bg-green-700 hover: text-white rounded-full disabled:bg-gray-700 disabled:opacity-50"
@@ -61,13 +61,13 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
             </div>}
             {playlistInfo.current !== null ? playlistInfo.current?.items?.map((item: Playlist) => (
                 <div key={item.id} className="py-2 border-gray-800 border-b pb-2 last:border-0">
-                    <div className="flex flex-row items-center justify-baseline text-left gap-8">
+                    <div className="flex flex-col md:flex-row items-center justify-center md:justify-baseline text-center md:text-left gap-8">
                         <Image id={item.id} src={item.images[0].url} alt={item.name} height={640} width={640} className="size-24 md:size-32 rounded-xl hover:opacity-65 hover:border-2 hover:border-white hover:p-1 transition-all duration-200" priority={true} onClick={() => { setActivePlaylist(item.id); setShowPlaylist(true) }} />
                         <div className="flex flex-col">
                             <p className="text-l font-bold">{item.name}</p>
                             <p className="text-m font-light text-gray-400">{item.owner.display_name}</p>
                         </div>
-                        <button value={item.uri} onClick={startPlaylist} className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 cursor-pointer ml-auto"> <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Play</button>
+                        <button value={item.uri} onClick={startPlaylist} className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 cursor-pointer md:ml-auto"> <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Play</button>
                     </div>
                 </div>
             )) : null}

@@ -30,18 +30,24 @@ interface playPauseProps {
 }
 
 export async function playPause({ isPlay, collectionURI, songURI }: playPauseProps) {
+    const body = collectionURI
+        ? songURI
+            ? JSON.stringify({
+                context_uri: collectionURI,
+                offset: { uri: songURI }
+            })
+            : JSON.stringify({
+                context_uri: collectionURI
+            })
+        : null;
+
     const response = await fetch("https://api.spotify.com/v1/me/player" + (isPlay ? "/play" : "/pause"), {
         headers: {
             "Authorization": "Bearer " + localStorage.getItem("access_token"),
             "Content-Type": "application/json"
         },
         method: "PUT",
-        body: collectionURI ? JSON.stringify({
-            context_uri: collectionURI || "",
-            offset: {
-                uri: songURI || ""
-            }
-        }) : null
+        body: body
     });
     return response.ok
 
@@ -112,4 +118,49 @@ export async function getPlaylist(uri: string) {
         },
     });
     return await response.json();
+}
+
+export async function getLikedSongs(limit: number, offset: number) {
+    const response = await fetch(" https://api.spotify.com/v1/me/tracks?" + new URLSearchParams({
+        limit: limit.toString() || "5",
+        offset: offset.toString() || "0",
+    }).toString(), {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+    });
+    return await response.json();
+}
+
+export async function setRepeatType(repeat: number) {
+    let repeatType;
+    switch (repeat) {
+        case 0:
+            repeatType = "off";
+            break;
+        case 1:
+            repeatType = "context";
+            break;
+        case 2:
+            repeatType = "track";
+            break;
+    }
+    const response = await fetch(" https://api.spotify.com/v1/me/player/repeat?state=" + repeatType, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+        method: "PUT"
+    });
+    return response.status;
+
+}
+
+export async function toggleShuffle(toggled: boolean) {
+    const response = await fetch(" https://api.spotify.com/v1/me/player/shuffle?state=" + toggled, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+        method: "PUT"
+    });
+    return response.status;
 }

@@ -4,13 +4,16 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { PlayerInfoRequest } from "../app/types";
 import { ScaleLoader } from "react-spinners";
-import { isPremiumUser, playPause, refreshToken, skip } from "../app/spotify";
-import { FaBackwardStep, FaForwardStep, FaHeadphones, FaPlay } from "react-icons/fa6";
+import { isPremiumUser, playPause, refreshToken, setRepeatType, skip, toggleShuffle } from "../app/spotify";
+import { FaBackwardStep, FaForwardStep, FaHeadphones, FaPlay, FaRepeat, FaShuffle } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import DeviceModal from "./modals/devices";
 import { createPortal } from "react-dom";
 import Playlists from "./playlists";
+import LikedSongs from "./liked";
+import { TbRepeat, TbRepeatOff, TbRepeatOnce } from "react-icons/tb";
+import { BiSpeaker } from "react-icons/bi";
 
 export default function Player() {
 
@@ -22,13 +25,14 @@ export default function Player() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [showDevices, setShowDevices] = useState(false);
     const [showPlaylist, setShowPlaylist] = useState(false);
-
+    const [repeatState, setRepeatState] = useState(0);
+    const [shuffleState, setShuffleState] = useState(false);
 
     const info = useCallback(getPlayerInfo, [router])
 
     async function getPlayerInfo() {
         if (localStorage.getItem("refresh_token")) {
-            const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+            const response = await fetch("https://api.spotify.com/v1/me/player", {
                 headers: {
                     "authorization": "Bearer " + localStorage.getItem("access_token")
                 },
@@ -47,6 +51,7 @@ export default function Player() {
                 const data = await response.json();
                 setPlayerInfo(data);
                 setIsLoading(false);
+                setIsRefetching(false);
             }
         }
         else {
@@ -67,6 +72,29 @@ export default function Player() {
         await skip(false);
     }
 
+    async function handleRepeat() {
+        await setRepeatType((repeatState + 1) % 3);
+        setRepeatState((repeatState + 1) % 3);
+    }
+
+    async function handleShuffle() {
+        await toggleShuffle(!shuffleState);
+        setShuffleState(!shuffleState);
+    }
+
+    function getRepeatIcon() {
+        switch (repeatState) {
+            case 0:
+                return <TbRepeatOff className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+            case 1:
+                return <TbRepeat className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+            case 2:
+                return <TbRepeatOnce className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />;
+            default:
+                return <TbRepeatOff className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+        }
+    }
+
 
     useEffect(() => {
         async function getPremiumStatus() {
@@ -78,7 +106,23 @@ export default function Player() {
 
     useEffect(() => {
         if (playerInfo?.is_playing !== undefined) {
-            setIsPlaying(playerInfo?.is_playing)
+            setIsPlaying(playerInfo.is_playing);
+        }
+        if (playerInfo?.repeat_state !== undefined) {
+            switch (playerInfo.repeat_state) {
+                case "off":
+                    setRepeatState(0);
+                    break;
+                case "context":
+                    setRepeatState(1);
+                    break;
+                case "track":
+                    setRepeatState(2);
+                    break;
+            }
+        }
+        if (playerInfo?.shuffle_state !== undefined) {
+            setShuffleState(playerInfo.shuffle_state)
         }
     }, [playerInfo])
 
@@ -96,8 +140,8 @@ export default function Player() {
                     {!isRefetching ? <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
                 </div>
                 :
-                <div className={"relative flex flex-col gap-6 transition-all items-center text-center" + (showDevices || showPlaylist ? " blur-xl" : "")}>
-                    <div className="items-center justify-center">
+                <div className={"flex flex-col gap-6 transition-all items-center text-center" + (showDevices || showPlaylist ? " blur-xl" : "")}>
+                    <div className="items-center justify-center mt-[15dvh] mb-[5dvh] md:mt-[30dvh] mx-auto">
                         <div className="flex flex-col items-center gap-6 font-sans">
                             {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
                                 <Image
@@ -142,7 +186,7 @@ export default function Player() {
                                 </p>
                             )}
                             {playerInfo?.progress_ms && playerInfo?.item?.duration_ms && (
-                                <div className="w-[80lvw] lg:w-[40lvw] bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                                <div className="w-[80lvw] md:w-[60lvw] lg:w-[40lvw] justify-self-center mx-auto bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
                                     <div
                                         className="bg-green-500 h-2.5"
                                         style={{
@@ -153,19 +197,62 @@ export default function Player() {
                                 </div>
                             )}
                         </div>
-                        {!isLoading && playerInfo !== null && <div className="flex flex-row justify-center items-center gap-3 mt-6">
+                        {!isLoading && playerInfo !== null && <div className="flex flex-row justify-center gap-6 items-center mt-6">
                             {isPremium && (
                                 <>
-                                    <button onClick={() => { setShowDevices(true); }} className=" cursor-pointer rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
+                                    <button onClick={() => { setShowDevices(true); }} className=" cursor-pointer rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><BiSpeaker className="text-white text-l md:text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
                                     {showDevices && createPortal(<DeviceModal onClose={() => setShowDevices(false)} />, document.body)}
-                                    <button onClick={handleSkipPrev} id="player_skipb" className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaBackwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
-                                    <button onClick={handlePlayPause} id="player_playpause" className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200">{isPlaying ? <FaPause className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /> : <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />}</button>
-                                    <button onClick={handleSkipNext} id="player_skipf" className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaForwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
+                                    <div className="flex flex-row items-center justify-center gap-3">
+                                        <button
+                                            onClick={handleSkipPrev}
+                                            id="player_skipb"
+                                            className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"
+                                        >
+                                            <FaBackwardStep className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+                                        </button>
+                                        <button
+                                            onClick={handlePlayPause}
+                                            id="player_playpause"
+                                            className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"
+                                        >
+                                            {isPlaying ? (
+                                                <FaPause className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+                                            ) : (
+                                                <FaPlay className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={handleSkipNext}
+                                            id="player_skipf"
+                                            className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"
+                                        >
+                                            <FaForwardStep className="text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" />
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-row items-center justify-center gap-3">
+                                        <button
+                                            onClick={handleRepeat}
+                                            id="player_repeat"
+                                            className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"
+                                        >
+                                            {getRepeatIcon()}
+                                        </button>
+                                        <button
+                                            onClick={handleShuffle}
+                                            id="player_shuffle"
+                                            className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"
+                                        >
+                                            <FaShuffle className={"text-white text-lg md:text-2xl group-hover:text-gray-800 transition-colors duration-200" + (!shuffleState ? " opacity-50" : "")} />
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>}
                     </div>
-                    <Playlists showPlaylist={showPlaylist} setShowPlaylist={setShowPlaylist} />
+                    <div className="flex flex-col w-[50dvw] mx-auto">
+                        <LikedSongs />
+                        <Playlists showPlaylist={showPlaylist} setShowPlaylist={setShowPlaylist} />
+                    </div>
                 </div>}
         </>
     );

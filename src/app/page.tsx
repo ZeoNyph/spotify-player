@@ -46,13 +46,19 @@ export default function Home() {
     }
   }, [token]);
 
+  const [isClient, setIsClient] = React.useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <Suspense>
       <div className="flex flex-col items-center justify-center min-h-screen font-sans gap-8">
-        {typeof window !== "undefined" && !localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
+        {isClient && !localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
           <h1 className="text-4xl font-bold mb-4">Spotify Player</h1>
         )}
-        {typeof window !== "undefined" && !localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
+        {isClient && !localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
           <a
             href="/login"
             className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4 flex flex-row items-center gap-2 cursor-pointer"
@@ -60,7 +66,7 @@ export default function Home() {
             <FaSpotify></FaSpotify>Login with Spotify
           </a>
         )}
-        {typeof window !== "undefined" && localStorage.getItem("refresh_token") ? <>
+        {isClient && localStorage.getItem("refresh_token") ? <>
           <Player />
         </> : null}
       </div>

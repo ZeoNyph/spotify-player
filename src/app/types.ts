@@ -157,7 +157,29 @@ export interface Item {
 export interface Track {
     album: Album
     artists: Artist[]
-    uri: string
-    name: string
+    available_markets: string[]
+    disc_number: number
+    duration_ms: number
+    explicit: boolean
+    external_ids: ExternalIds
+    external_urls: ExternalUrls
+    href: string
     id: string
+    is_local: boolean
+    is_playable: boolean
+    name: string
+    popularity: number
+    preview_url: string | null
+    track_number: number
+    type: string
+    uri: string
+}
+export interface LikedSongsRequest {
+    href: string
+    items: Item[]
+    limit: number
+    next: string | null
+    offset: number
+    previous: string | null
+    total: number
 }
