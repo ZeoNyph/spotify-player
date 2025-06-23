@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "";
+const redirect_url = process.env.NEXT_PUBLIC_SPOTIFY_REDIR_URL || "";
 
 function generateRandomString(length: number) {
   let result = '';
@@ -38,7 +39,7 @@ export async function GET() {
 
   params.set("client_id", client_id);
   params.set("response_type", "code");
-  params.set("redirect_uri", "http://127.0.0.1:3000/");
+  params.set("redirect_uri", redirect_url);
   params.set("state", generateRandomString(16));
   params.set("scope", "user-read-playback-state user-read-currently-playing user-modify-playback-state user-read-private");
   params.set("code_challenge_method", "S256");
