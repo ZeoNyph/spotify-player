@@ -62,7 +62,7 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
             {playlistInfo.current !== null ? playlistInfo.current?.items?.map((item: Playlist) => (
                 <div key={item.id} className="py-2 border-gray-800 border-b pb-2 last:border-0">
                     <div className="flex flex-row items-center justify-baseline text-left gap-8">
-                        <Image id={item.id} src={item.images[0].url} alt={item.name} height={640} width={640} className="size-24 md:size-32 rounded-xl" priority={true} onClick={() => { setActivePlaylist(item.id); setShowPlaylist(true) }} />
+                        <Image id={item.id} src={item.images[0].url} alt={item.name} height={640} width={640} className="size-24 md:size-32 rounded-xl hover:opacity-65 hover:border-2 hover:border-white hover:p-1 transition-all duration-200" priority={true} onClick={() => { setActivePlaylist(item.id); setShowPlaylist(true) }} />
                         <div className="flex flex-col">
                             <p className="text-l font-bold">{item.name}</p>
                             <p className="text-m font-light text-gray-400">{item.owner.display_name}</p>

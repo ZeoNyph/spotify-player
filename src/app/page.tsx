@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Player from '../components/player';
 import { useSearchParams } from 'next/navigation';
 import { FaSpotify } from 'react-icons/fa';
@@ -47,21 +47,23 @@ export default function Home() {
   }, [isLoading, params, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen font-sans gap-8">
-      {!localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
-        <h1 className="text-4xl font-bold mb-4">Spotify Player</h1>
-      )}
-      {!localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
-        <a
-          href="/login"
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4 flex flex-row items-center gap-2 cursor-pointer"
-        >
-          <FaSpotify></FaSpotify>Login with Spotify
-        </a>
-      )}
-      {localStorage.getItem("refresh_token") ? <>
-        <Player />
-      </> : null}
-    </div>
+    <Suspense>
+      <div className="flex flex-col items-center justify-center min-h-screen font-sans gap-8">
+        {!localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
+          <h1 className="text-4xl font-bold mb-4">Spotify Player</h1>
+        )}
+        {!localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
+          <a
+            href="/login"
+            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4 flex flex-row items-center gap-2 cursor-pointer"
+          >
+            <FaSpotify></FaSpotify>Login with Spotify
+          </a>
+        )}
+        {localStorage.getItem("refresh_token") ? <>
+          <Player />
+        </> : null}
+      </div>
+    </Suspense>
   );
 }
