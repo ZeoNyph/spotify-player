@@ -5,7 +5,7 @@ import Image from "next/image";
 import { PlayerInfoRequest } from "../app/types";
 import { ScaleLoader } from "react-spinners";
 import { isPremiumUser, playPause, refreshToken, setRepeatType, skip, toggleShuffle } from "../app/spotify";
-import { FaBackwardStep, FaForwardStep, FaHeadphones, FaPlay, FaRepeat, FaShuffle } from "react-icons/fa6";
+import { FaBackwardStep, FaForwardStep, FaPlay, FaShuffle } from "react-icons/fa6";
 import { FaPause } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import DeviceModal from "./modals/devices";
@@ -137,7 +137,7 @@ export default function Player() {
                 <div className={"flex flex-col items-center gap-3"}>
                     <ScaleLoader color="#ffffff" />
                     <p>{!isRefetching ? "Loading..." : "Token expired, refetching..."}</p>
-                    {!isRefetching ? <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
+                    {!isRefetching ? <p className="font-light text-center text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
                 </div>
                 :
                 <div className={"flex flex-col gap-6 transition-all items-center text-center" + (showDevices || showPlaylist ? " blur-xl" : "")}>
