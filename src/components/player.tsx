@@ -55,7 +55,7 @@ export default function Player() {
     }
 
     async function handlePlayPause() {
-        await playPause(!isPlaying);
+        await playPause({ isPlay: !isPlaying, uri: "" });
     }
 
     async function handleSkipNext() {
@@ -95,73 +95,75 @@ export default function Player() {
                     {!isRefetching ? <p className="font-light text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
                 </div>
                 :
-                <div className={"flex flex-col gap-6 transition-all items-center text-center" + (showDevices ? " blur-xl" : "")}>
-                    <div className="flex flex-col items-center gap-6 font-sans">
-                        {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
-                            <Image
-                                src={playerInfo.item.album.images[1].url}
-                                alt="Album cover"
-                                width={playerInfo.item.album.images[1].width}
-                                height={playerInfo.item.album.images[1].height}
-                                className="size-64 rounded-xl lg:rounded-3xl border-2 border-white p-2"
-                                priority={true}
-                            />
-                        )}
-                        <div className="flex flex-col items-center gap-4">
-                            {playerInfo?.item?.name && (
-                                <h1 className="text-xl font-bold">{playerInfo.item.name}</h1>
+                <div className={"relative flex flex-col gap-6 transition-all items-center text-center" + (showDevices ? " blur-xl" : "")}>
+                    <div className="items-center justify-center">
+                        <div className="flex flex-col items-center gap-6 font-sans">
+                            {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
+                                <Image
+                                    src={playerInfo.item.album.images[1].url}
+                                    alt="Album cover"
+                                    width={playerInfo.item.album.images[1].width}
+                                    height={playerInfo.item.album.images[1].height}
+                                    className="size-64 rounded-xl lg:rounded-3xl border-2 border-white p-2"
+                                    priority={true}
+                                />
                             )}
-                            {playerInfo?.item?.artists && playerInfo.item.artists.length > 0 && (
-                                <h2 className="text-l">
-                                    {playerInfo.item.artists.map((artist) => artist.name).join(", ")}
-                                </h2>
+                            <div className="flex flex-col items-center gap-4">
+                                {playerInfo?.item?.name && (
+                                    <h1 className="text-xl font-bold">{playerInfo.item.name}</h1>
+                                )}
+                                {playerInfo?.item?.artists && playerInfo.item.artists.length > 0 && (
+                                    <h2 className="text-l">
+                                        {playerInfo.item.artists.map((artist) => artist.name).join(", ")}
+                                    </h2>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-6">
+                            {playerInfo?.progress_ms !== undefined && playerInfo?.item?.duration_ms !== undefined && (
+                                <p>
+                                    {Math.floor((playerInfo.progress_ms / 1000) / 60)
+                                        .toString()
+                                        .padStart(2, '0')
+                                        +
+                                        ":" +
+                                        Math.floor((playerInfo.progress_ms / 1000) % 60)
+                                            .toString()
+                                            .padStart(2, '0') +
+                                        " / " +
+                                        Math.floor((playerInfo.item.duration_ms / 1000) / 60)
+                                            .toString()
+                                            .padStart(2, '0') +
+                                        ":" +
+                                        Math.floor((playerInfo.item.duration_ms / 1000) % 60)
+                                            .toString()
+                                            .padStart(2, '0')}
+                                </p>
+                            )}
+                            {playerInfo?.progress_ms && playerInfo?.item?.duration_ms && (
+                                <div className="w-[80lvw] lg:w-[40lvw] bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                                    <div
+                                        className="bg-green-500 h-2.5"
+                                        style={{
+                                            width: `${(playerInfo.progress_ms / playerInfo.item.duration_ms) * 100}%`,
+                                            transition: "width 0.2s linear"
+                                        }}
+                                    />
+                                </div>
                             )}
                         </div>
+                        {!isLoading && playerInfo !== null && <div className="flex flex-row justify-center items-center gap-3 mt-6">
+                            {isPremium && (
+                                <>
+                                    <button onClick={() => { setShowDevices(true); }} className=" cursor-pointer rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
+                                    {showDevices && createPortal(<DeviceModal onClose={() => setShowDevices(false)} />, document.body)}
+                                    <button onClick={handleSkipPrev} id="player_skipb" className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaBackwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
+                                    <button onClick={handlePlayPause} id="player_playpause" className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200">{isPlaying ? <FaPause className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /> : <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />}</button>
+                                    <button onClick={handleSkipNext} id="player_skipf" className="rounded-full cursor-pointer bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaForwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
+                                </>
+                            )}
+                        </div>}
                     </div>
-                    <div className="flex flex-col gap-6">
-                        {playerInfo?.progress_ms !== undefined && playerInfo?.item?.duration_ms !== undefined && (
-                            <p>
-                                {Math.floor((playerInfo.progress_ms / 1000) / 60)
-                                    .toString()
-                                    .padStart(2, '0')
-                                    +
-                                    ":" +
-                                    Math.floor((playerInfo.progress_ms / 1000) % 60)
-                                        .toString()
-                                        .padStart(2, '0') +
-                                    " / " +
-                                    Math.floor((playerInfo.item.duration_ms / 1000) / 60)
-                                        .toString()
-                                        .padStart(2, '0') +
-                                    ":" +
-                                    Math.floor((playerInfo.item.duration_ms / 1000) % 60)
-                                        .toString()
-                                        .padStart(2, '0')}
-                            </p>
-                        )}
-                        {playerInfo?.progress_ms && playerInfo?.item?.duration_ms && (
-                            <div className="w-[80lvw] lg:w-[40lvw] bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
-                                <div
-                                    className="bg-green-500 h-2.5"
-                                    style={{
-                                        width: `${(playerInfo.progress_ms / playerInfo.item.duration_ms) * 100}%`,
-                                        transition: "width 0.2s linear"
-                                    }}
-                                />
-                            </div>
-                        )}
-                    </div>
-                    {!isLoading && playerInfo !== null && <div className="flex flex-row items-center gap-3">
-                        {isPremium && (
-                            <>
-                                <button onClick={() => { setShowDevices(true); }} className="rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaHeadphones className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />Devices</button>
-                                {showDevices && createPortal(<DeviceModal onClose={() => setShowDevices(false)} />, document.body)}
-                                <button onClick={handleSkipPrev} id="player_skipb" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaBackwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
-                                <button onClick={handlePlayPause} id="player_playpause" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200">{isPlaying ? <FaPause className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /> : <FaPlay className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" />}</button>
-                                <button onClick={handleSkipNext} id="player_skipf" className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><FaForwardStep className="text-white text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
-                            </>
-                        )}
-                    </div>}
                     <Playlists />
                 </div>}
         </>

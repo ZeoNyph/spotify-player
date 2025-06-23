@@ -54,7 +54,7 @@ export default function Home() {
       {!localStorage.getItem("access_token") && !localStorage.getItem("refresh_token") && (
         <a
           href="/login"
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4 flex flex-row items-center gap-2"
+          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mb-4 flex flex-row items-center gap-2 cursor-pointer"
         >
           <FaSpotify></FaSpotify>Login with Spotify
         </a>
