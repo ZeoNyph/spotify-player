@@ -108,11 +108,48 @@ export async function getPlaylists(limit: number, offset: number) {
     return await response.json();
 }
 
+export async function getAlbums(limit: number, offset: number) {
+    const response = await fetch(" https://api.spotify.com/v1/me/albums?" + new URLSearchParams({
+        limit: limit.toString() || "10",
+        offset: offset.toString() || "0",
+    }).toString(), {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+    });
+    return await response.json();
+}
+
 export async function getPlaylist(uri: string) {
     const url = new URL("https://api.spotify.com/v1/playlists/" + uri + "?")
     const response = await fetch(url + new URLSearchParams({
         fields: "uri,tracks.items(track(id, name, uri, artists, album(name, href))"
     }).toString(), {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+    });
+    return await response.json();
+}
+
+export async function getAlbum(uri: string) {
+    const url = new URL("https://api.spotify.com/v1/albums/" + uri + "?")
+    const response = await fetch(url + new URLSearchParams({
+        fields: "uri,tracks.items(track(id, name, uri, artists, album(name, href))"
+    }).toString(), {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+        },
+    });
+    return await response.json();
+}
+
+export async function getAlbumTracks(uri: string, limit: number, offset: number) {
+    const url = new URL("https://api.spotify.com/v1/albums/" + uri + "/tracks/?" + new URLSearchParams({
+        limit: limit.toString() || "10",
+        offset: offset.toString() || "0",
+    }).toString())
+    const response = await fetch(url, {
         headers: {
             "Authorization": "Bearer " + localStorage.getItem("access_token"),
         },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { PlayerInfoRequest } from "../app/types";
 import { ScaleLoader } from "react-spinners";
@@ -10,12 +10,15 @@ import { FaPause } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import DeviceModal from "./modals/devices";
 import { createPortal } from "react-dom";
-import Playlists from "./playlists";
-import LikedSongs from "./liked";
 import { TbRepeat, TbRepeatOff, TbRepeatOnce } from "react-icons/tb";
 import { BiSpeaker } from "react-icons/bi";
 
-export default function Player() {
+type PlayerProps = {
+    isModalOpen: boolean
+    setIsModalOpen: Dispatch<SetStateAction<boolean>>
+}
+
+export default function Player({ isModalOpen, setIsModalOpen }: PlayerProps) {
 
     const router = useRouter();
     const [playerInfo, setPlayerInfo] = useState<PlayerInfoRequest | null>(null);
@@ -24,7 +27,6 @@ export default function Player() {
     const [isPremium, setIsPremium] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [showDevices, setShowDevices] = useState(false);
-    const [showPlaylist, setShowPlaylist] = useState(false);
     const [repeatState, setRepeatState] = useState(0);
     const [shuffleState, setShuffleState] = useState(false);
 
@@ -140,7 +142,7 @@ export default function Player() {
                     {!isRefetching ? <p className="font-light text-center text-l text-gray-700">Make sure at least one device has Spotify open and playing.</p> : null}
                 </div>
                 :
-                <div className={"flex flex-col gap-6 transition-all items-center text-center" + (showDevices || showPlaylist ? " blur-xl" : "")}>
+                <div className={"flex flex-col gap-6 transition-all items-center text-center" + (isModalOpen ? " blur-xl" : "")}>
                     <div className="items-center justify-center mt-[15dvh] mb-[5dvh] md:mt-[30dvh] mx-auto">
                         <div className="flex flex-col items-center gap-6 font-sans">
                             {playerInfo?.item?.album?.images && playerInfo.item.album.images.length > 1 && (
@@ -200,8 +202,8 @@ export default function Player() {
                         {!isLoading && playerInfo !== null && isPremium && (
                             <div className="flex flex-row justify-center gap-6 items-center mt-6">
                                 <>
-                                    <button onClick={() => { setShowDevices(true); }} className=" cursor-pointer rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><BiSpeaker className="text-white text-l md:text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
-                                    {showDevices && createPortal(<DeviceModal onClose={() => setShowDevices(false)} />, document.body)}
+                                    <button onClick={() => { setIsModalOpen(true); setShowDevices(true); }} className=" cursor-pointer rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><BiSpeaker className="text-white text-l md:text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
+                                    {showDevices && createPortal(<DeviceModal onClose={() => { setIsModalOpen(false); setShowDevices(false) }} />, document.body)}
                                     <div className="flex flex-row items-center justify-center gap-3">
                                         <button
                                             onClick={handleSkipPrev}
@@ -248,10 +250,6 @@ export default function Player() {
                                 </>
                             </div>
                         )}
-                    </div>
-                    <div className="flex flex-col w-[50dvw] mx-auto">
-                        <LikedSongs />
-                        <Playlists showPlaylist={showPlaylist} setShowPlaylist={setShowPlaylist} />
                     </div>
                 </div>}
         </>

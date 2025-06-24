@@ -1,14 +1,19 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import Player from '../components/player';
 import { FaSpotify } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';;
 import { getCookie } from 'cookies-next/client';
+import LikedSongs from '@/components/liked';
+import Playlists from '@/components/playlists';
+import Albums from '@/components/albums';
 export default function Home() {
 
   const router = useRouter();
   const token = useCallback(getToken, [router])
+  const [showPlaylist, setShowPlaylist] = useState(false);
+  const [isModalOpen, setisModalOpen] = useState(false);
 
   async function getToken() {
     const client_id = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
@@ -67,7 +72,12 @@ export default function Home() {
           </a>
         )}
         {isClient && localStorage.getItem("refresh_token") ? <>
-          <Player />
+          <Player isModalOpen={isModalOpen} setIsModalOpen={setisModalOpen} />
+          <div className="flex flex-col w-[50dvw] mx-auto">
+            <LikedSongs isModalOpen={isModalOpen} />
+            <Albums isModalOpen={isModalOpen} setIsModalOpen={setisModalOpen} />
+            <Playlists showPlaylist={showPlaylist} setShowPlaylist={setShowPlaylist} isModalOpen={isModalOpen} setIsModalOpen={setisModalOpen} />
+          </div>
         </> : null}
       </div>
     </Suspense>

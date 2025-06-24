@@ -72,6 +72,7 @@ export interface Album {
     total_tracks: number
     type: string
     uri: string
+    tracks: Track[]
 }
 
 export interface Artist {
@@ -139,6 +140,7 @@ export interface Owner {
 export interface Tracks {
     href: string
     total: number
+    items: Track[]
 }
 
 export interface PlaylistRequest {
@@ -177,6 +179,16 @@ export interface Track {
 export interface LikedSongsRequest {
     href: string
     items: Item[]
+    limit: number
+    next: string | null
+    offset: number
+    previous: string | null
+    total: number
+}
+
+export interface AlbumRequest {
+    href: string
+    items: Track[]
     limit: number
     next: string | null
     offset: number

@@ -1,7 +1,7 @@
 import { getPlaylists, playPause } from "@/app/spotify";
 import { Playlist, PlaylistsRequest } from "@/app/types";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaArrowLeft, FaArrowRight, FaPlay } from "react-icons/fa6";
 import { ScaleLoader } from "react-spinners";
@@ -9,16 +9,18 @@ import PlaylistModal from "./modals/playlist";
 
 type PlaylistProps = {
     showPlaylist: boolean,
-    setShowPlaylist: Dispatch<SetStateAction<boolean>>
+    setShowPlaylist: Dispatch<SetStateAction<boolean>>,
+    isModalOpen: boolean,
+    setIsModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistProps) {
-    const playlistInfo = useRef<PlaylistsRequest | null>(null);
+export default function Playlists({ showPlaylist, setShowPlaylist, isModalOpen, setIsModalOpen }: PlaylistProps) {
+    const [playlistInfo, setPlaylistInfo] = useState<PlaylistsRequest | null>(null);
     const [activePlaylist, setActivePlaylist] = useState("");
 
     useEffect(() => {
         (async () => {
-            playlistInfo.current = await getPlaylists(10, 0);
+            setPlaylistInfo(await getPlaylists(10, 0));
         })();
     }, []);
 
@@ -26,16 +28,16 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
         await playPause({ isPlay: true, collectionURI: e.currentTarget.value })
     }
     return (
-        <div className="mt-10 mb-5 flex flex-col justify-baseline gap-2 px-6">
+        <div className={"mt-10 mb-5 flex flex-col justify-baseline gap-2 px-6" + (isModalOpen ? " blur-xl" : "")}>
             <div className="flex flex-col md:flex-row justify-between gap-2">
                 <h1 className="text-2xl font-bold text-center md:text-left pl-2">Playlists</h1>
                 <div>
                     <button
                         className="px-4 py-2 mr-2 bg-green-700 hover: text-white rounded-full disabled:bg-gray-700 disabled:opacity-50"
-                        disabled={!playlistInfo.current || playlistInfo.current.offset === 0}
+                        disabled={!playlistInfo || playlistInfo.offset === 0}
                         onClick={async () => {
-                            if (!playlistInfo.current) return;
-                            playlistInfo.current = await getPlaylists(10, Math.max(0, playlistInfo.current.offset - 10));
+                            if (!playlistInfo) return;
+                            setPlaylistInfo(await getPlaylists(10, Math.max(0, playlistInfo.offset - 10)));
                         }}
                     >
                         <FaArrowLeft />
@@ -43,26 +45,26 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
                     <button
                         className="px-4 py-2 bg-green-700 text-white rounded-full disabled:bg-gray-700 disabled:opacity-50"
                         disabled={
-                            !playlistInfo.current ||
-                            playlistInfo.current.offset + playlistInfo.current.limit >= playlistInfo.current.total
+                            !playlistInfo ||
+                            playlistInfo.offset + playlistInfo.limit >= playlistInfo.total
                         }
                         onClick={async () => {
-                            if (!playlistInfo.current) return;
-                            playlistInfo.current = await getPlaylists(10, playlistInfo.current.offset + 10);
+                            if (!playlistInfo) return;
+                            setPlaylistInfo(await getPlaylists(10, playlistInfo.offset + 10));
                         }}
                     >
                         <FaArrowRight />
                     </button>
                 </div>
             </div>
-            {playlistInfo.current === null && <div className={"flex flex-col items-center gap-3"}>
+            {playlistInfo === null && <div className={"flex flex-col items-center gap-3"}>
                 <ScaleLoader color="#ffffff" />
                 <p>Loading...</p>
             </div>}
-            {playlistInfo.current !== null ? playlistInfo.current?.items?.map((item: Playlist) => (
+            {playlistInfo !== null ? playlistInfo?.items?.map((item: Playlist) => (
                 <div key={item.id} className="py-2 border-gray-800 border-b pb-2 last:border-0">
                     <div className="flex flex-col md:flex-row items-center justify-center md:justify-baseline text-center md:text-left gap-8">
-                        <Image id={item.id} src={item.images[0].url} alt={item.name} height={640} width={640} className="size-24 md:size-32 rounded-xl hover:opacity-65 hover:border-2 hover:border-white hover:p-1 transition-all duration-200" priority={true} onClick={() => { setActivePlaylist(item.id); setShowPlaylist(true) }} />
+                        <Image id={item.id} src={item.images[0].url} alt={item.name} height={640} width={640} className="size-24 md:size-32 cursor-pointer rounded-xl hover:opacity-65 hover:border-2 hover:border-white hover:p-1 transition-all duration-200" priority={true} onClick={() => { setActivePlaylist(item.id); setIsModalOpen(true); setShowPlaylist(true) }} />
                         <div className="flex flex-col">
                             <p className="text-l font-bold">{item.name}</p>
                             <p className="text-m font-light text-gray-400">{item.owner.display_name}</p>
@@ -71,14 +73,14 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
                     </div>
                 </div>
             )) : null}
-            {showPlaylist && createPortal(<PlaylistModal onClose={() => setShowPlaylist(false)} uri={activePlaylist} />, document.body)}
+            {showPlaylist && createPortal(<PlaylistModal onClose={() => { setIsModalOpen(false); setShowPlaylist(false) }} uri={activePlaylist} />, document.body)}
             <div className="mt-2 mb-5">
                 <button
                     className="px-4 py-2 mr-2 bg-green-700 hover: text-white rounded-full disabled:bg-gray-700 disabled:opacity-50"
-                    disabled={!playlistInfo.current || playlistInfo.current.offset === 0}
+                    disabled={!playlistInfo || playlistInfo.offset === 0}
                     onClick={async () => {
-                        if (!playlistInfo.current) return;
-                        playlistInfo.current = await getPlaylists(10, Math.max(0, playlistInfo.current.offset - 10));
+                        if (!playlistInfo) return;
+                        setPlaylistInfo(await getPlaylists(10, Math.max(0, playlistInfo.offset - 10)));
                     }}
                 >
                     <FaArrowLeft />
@@ -86,12 +88,12 @@ export default function Playlists({ showPlaylist, setShowPlaylist }: PlaylistPro
                 <button
                     className="px-4 py-2 bg-green-700 text-white rounded-full disabled:bg-gray-700 disabled:opacity-50"
                     disabled={
-                        !playlistInfo.current ||
-                        playlistInfo.current.offset + playlistInfo.current.limit >= playlistInfo.current.total
+                        !playlistInfo ||
+                        playlistInfo.offset + playlistInfo.limit >= playlistInfo.total
                     }
                     onClick={async () => {
-                        if (!playlistInfo.current) return;
-                        playlistInfo.current = await getPlaylists(10, playlistInfo.current.offset + 10);
+                        if (!playlistInfo) return;
+                        setPlaylistInfo(await getPlaylists(10, playlistInfo.offset + 10));
                     }}
                 >
                     <FaArrowRight />
