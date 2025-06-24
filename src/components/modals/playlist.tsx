@@ -26,7 +26,7 @@ export default function PlaylistModal({ onClose, uri = "" }: PlaylistModalProps)
     return (
         <div className="fixed inset-0 flex flex-col gap-2 items-center justify-center bg-opacity-20 z-50 font-sans">
             <div className="bg-white rounded-lg shadow-lg p-6 min-w-[300px] max-h-[80dvh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-row justify-between items-center mb-4">
                     <p className="text-lg text-gray-900 font-semibold">Songs</p>
                     <button
                         onClick={onClose}
@@ -55,10 +55,10 @@ export default function PlaylistModal({ onClose, uri = "" }: PlaylistModalProps)
                         <ScaleLoader color="#000000" className="mx-auto" />
                     )}
                 </div>
-                <div className="flex justify-end my-2">
+                <div className="flex sticky justify-end my-2">
                     <button
                         onClick={onClose}
-                        className="rounded-full bg-green-700 hover:bg-green-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 text-white hover:text-gray-900"
+                        className="rounded-full bg-red-700 hover:bg-red-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 text-white hover:text-gray-900"
                     >
                         Close
                     </button>
