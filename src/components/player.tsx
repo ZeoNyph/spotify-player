@@ -197,8 +197,8 @@ export default function Player() {
                                 </div>
                             )}
                         </div>
-                        {!isLoading && playerInfo !== null && <div className="flex flex-row justify-center gap-6 items-center mt-6">
-                            {isPremium && (
+                        {!isLoading && playerInfo !== null && isPremium && (
+                            <div className="flex flex-row justify-center gap-6 items-center mt-6">
                                 <>
                                     <button onClick={() => { setShowDevices(true); }} className=" cursor-pointer rounded-full bg-green-700 hover:bg-green-400 hover:text-gray-800 p-2 md:p-3 flex flex-row items-center gap-2 group transition-colors duration-200"><BiSpeaker className="text-white text-l md:text-2xl group-hover:text-gray-800 transition-colors duration-200" /></button>
                                     {showDevices && createPortal(<DeviceModal onClose={() => setShowDevices(false)} />, document.body)}
@@ -246,8 +246,8 @@ export default function Player() {
                                         </button>
                                     </div>
                                 </>
-                            )}
-                        </div>}
+                            </div>
+                        )}
                     </div>
                     <div className="flex flex-col w-[50dvw] mx-auto">
                         <LikedSongs />
