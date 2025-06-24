@@ -43,19 +43,27 @@ export default function Home() {
     }
   }
 
-  useEffect(() => {
-    if (typeof window !== "undefined" &&
-      !localStorage.getItem("access_token") &&
-      !localStorage.getItem("refresh_token")) {
-      token();
-    }
-  }, [token]);
-
   const [isClient, setIsClient] = React.useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (isClient &&
+      !localStorage.getItem("access_token") &&
+      !localStorage.getItem("refresh_token")) {
+      token();
+    }
+  }, [token, isClient]);
+
+
+  function handleLogout() {
+    if (isClient) {
+      localStorage.removeItem("refresh_token");
+      router.push("/")
+    }
+  }
 
   return (
     <Suspense>
@@ -72,6 +80,14 @@ export default function Home() {
           </a>
         )}
         {isClient && localStorage.getItem("refresh_token") ? <>
+          <div className='relative'>
+            <button
+              className="fixed right-1/32 top-1/32 rounded-full bg-red-700 hover:bg-red-400 p-3 flex flex-row items-center gap-2 group transition-colors duration-200 text-white hover:text-gray-900"
+              onClick={handleLogout}
+            >
+              <FaSpotify></FaSpotify>Logout
+            </button>
+          </div>
           <Player isModalOpen={isModalOpen} setIsModalOpen={setisModalOpen} />
           <div className="flex flex-col w-[50dvw] mx-auto">
             <LikedSongs isModalOpen={isModalOpen} />
@@ -80,6 +96,6 @@ export default function Home() {
           </div>
         </> : null}
       </div>
-    </Suspense>
+    </Suspense >
   );
 }
