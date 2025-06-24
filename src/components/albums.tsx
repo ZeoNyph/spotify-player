@@ -29,7 +29,7 @@ export default function Albums({ isModalOpen, setIsModalOpen }: AlbumsProps) {
     return (
         <div className={"mt-10 mb-5 flex flex-col justify-baseline gap-2 px-6" + (isModalOpen ? " blur-xl" : "")}>
             <div className="flex flex-col md:flex-row justify-between gap-2">
-                <h1 className="text-2xl font-bold text-center md:text-left pl-2">Albums</h1>
+                <h1 className="text-2xl font-bold text-center md:text-left">Albums</h1>
                 <div>
                     <button
                         className="px-4 py-2 mr-2 bg-green-700 hover: text-white rounded-full disabled:bg-gray-700 disabled:opacity-50"
